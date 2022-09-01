@@ -1,21 +1,38 @@
+/**
+ * Representa a un nodo final, el cual es responsable de recibir y agrupar
+ * todos los mensajes en el orden que fueron recibidos
+ */
 public class NodoFin extends Thread{
-	
-	public NodoFin(Buzon buzon) {
-		this.buzon = buzon;
-		unificado="";
-		contador=0;
-	}
+
+	//-------------------------------------------------------------------
+	//------------------------- ATRIBUTOS -------------------------------
+	//-------------------------------------------------------------------
+
 
 	private Buzon buzon;
-	
+
 	private int contador;
-	
+
 	private String unificado;
-	
+
+	//-------------------------------------------------------------------
+	//----------------------- CONSTRUCTOR -------------------------------
+	//-------------------------------------------------------------------
+
+	public NodoFin(Buzon buzon) {
+		this.buzon = buzon;
+		unificado = "";
+		contador = 0;
+	}
+
+	//-------------------------------------------------------------------
+	//----------------------------- RUN ---------------------------------
+	//-------------------------------------------------------------------
+
 	@Override
 	public void run()
 	{
-		//System.out.println("Voy a recibir los mensajes");
+		Debug.print("Voy a recibir los mensajes");
 		while(contador<3)
 		{
 			while( !buzon.hayMensaje())
@@ -28,12 +45,12 @@ public class NodoFin extends Thread{
 			
 			if( mensaje.darTexto().equals("FIN"))
 			{
-				//System.out.println("Nodo fin recbio un FIN");
+				Debug.print("Nodo fin recbio un FIN");
 				contador++;
 			}
 		}
 		
-		System.out.println(unificado);
+		System.out.println(String.format("Mensaje unificado: %s",unificado));
 			
 	}
 

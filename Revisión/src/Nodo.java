@@ -1,8 +1,18 @@
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Representa a un nodo basico, el cual es responsable de procesar y transformar un mensaje dado.
+ *
+ * Un nodo esta a la espera de un mensaje dado por su buzon de entrada, una vez recibido un mensaje
+ * este se procesa de tal forma que se le concatena al mensaje original el nombre del nodo con la notacion T+nivel+proceso.
+ * Una vez terminada la transformacion se pasa el mensaje al buzon de salida y se repite el proceso hasta que el nodo
+ * recibe un thread "FIN" el cual indica mata al thread.
+ */
 public class Nodo extends Thread{
-	
 
+	//-------------------------------------------------------------------
+	//------------------------- ATRIBUTOS -------------------------------
+	//-------------------------------------------------------------------
 	private Buzon buzonEntrada;
 	
 	private Buzon buzonSalida;
@@ -14,7 +24,11 @@ public class Nodo extends Thread{
 	private Mensaje mensaje;
 	
 	private boolean finRecibido;
-	
+
+	//-------------------------------------------------------------------
+	//----------------------- CONSTRUCTOR -------------------------------
+	//-------------------------------------------------------------------
+
 	public Nodo(Buzon buzonEntrada, Buzon buzonSalida, int nivel, int proceso) {
 		this.buzonEntrada = buzonEntrada;
 		this.buzonSalida = buzonSalida;
@@ -23,36 +37,35 @@ public class Nodo extends Thread{
 		this.finRecibido = false;
 		this.mensaje= new Mensaje("MensajeInicio");
 	}
-	
+
+	//-------------------------------------------------------------------
+	//----------------------------- RUN ---------------------------------
+	//-------------------------------------------------------------------
+
 	@Override
 	public void run()
 	{
 		while(!finRecibido){
 			
-			synchronized(buzonEntrada)
-			{
+			synchronized(buzonEntrada){
 				//Mirar si hay mensajes
 				
-				//System.out.println("Voy a mirar si hay mensajes" + nivel + proceso);
+				Debug.print("Voy a mirar si hay mensajes" + nivel + proceso);
 				while(! buzonEntrada.hayMensaje())
 				{
 					try {
 						buzonEntrada.wait();
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
-				//System.out.println(buzonEntrada.hayMensaje());
-				//System.out.println("Me enviaron un mensaje" + nivel + proceso);
-				//Me envian mensaje, recibo un mensaje
-				
+				Debug.print(Boolean.toString(buzonEntrada.hayMensaje()));
+				Debug.print("Me enviaron un mensaje" + nivel + proceso);
 			}
 			
 			mensaje= buzonEntrada.enviar();
 			
-			synchronized(buzonEntrada)
-			{
+			synchronized(buzonEntrada){
 				buzonEntrada.notify();
 			}
 			
@@ -69,17 +82,16 @@ public class Nodo extends Thread{
 			//Envio un mensaje, recibe el mensaje
 			synchronized(buzonSalida)
 			{
-				//System.out.println("Voy a ver si hay capacidad" + nivel + proceso);
+				Debug.print("Voy a ver si hay capacidad" + nivel + proceso);
 				while(! buzonSalida.hayCapacidad())
 				{
 					try {
 						buzonSalida.wait();
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
+					} catch (InterruptedException e){
 						e.printStackTrace();
 					}
 				}
-				//System.out.println("Mandé un mensaje" + nivel + proceso);
+				Debug.print("Mandé un mensaje" + nivel + proceso);
 				
 			}
 			
@@ -92,21 +104,23 @@ public class Nodo extends Thread{
 		}
 		
 	}
-	
-	public void esperar()
-	{
+
+	//-------------------------------------------------------------------
+	//--------------------------- METODOS -------------------------------
+	//-------------------------------------------------------------------
+
+	public void esperar(){
 		try {
 			int tiempo=ThreadLocalRandom.current().nextInt(50, 500); 
 			Thread.sleep(tiempo);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
 	public synchronized void transformar(Mensaje mensaje)
 	{
-		if(! mensaje.darTexto().equals("FIN"))
+		if(!mensaje.darTexto().equals("FIN"))
 		{
 			mensaje.agregar("T" + nivel + proceso);
 		}

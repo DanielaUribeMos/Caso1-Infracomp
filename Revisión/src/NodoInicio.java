@@ -12,9 +12,8 @@ public class NodoInicio extends Thread{
 	private ArrayList<Mensaje> lista;
 
 	@Override
-	public void run()
-	{
-		//System.out.println("Voy a mandar los mensajes");
+	public void run(){
+		Debug.print("Voy a mandar los mensajes");
 		for(int i=0; i<lista.size(); i++)
 		{
 			while( !buzon.hayCapacidad())
@@ -22,8 +21,7 @@ public class NodoInicio extends Thread{
 				Thread.yield();
 			}
 
-			//System.out.println();
-			//System.out.println("Mandé mensaje" + i);
+			Debug.print("Mandé mensaje" + i);
 
 			buzon.recibir(lista.get(i));
 
