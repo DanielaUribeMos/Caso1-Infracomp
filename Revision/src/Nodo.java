@@ -72,11 +72,7 @@ public class Nodo extends Thread{
 			//Esperar
 			esperar();
 			
-			//Transformarse
-			if(mensaje.equals(null))
-			{
-				System.out.println("Soy null");
-			}
+			//Transformar
 			transformar(mensaje);
 	
 			//Envio un mensaje, recibe el mensaje
